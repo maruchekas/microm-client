@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: message-mate
+server:
+  port: 8008
