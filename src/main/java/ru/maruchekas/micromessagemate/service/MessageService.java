@@ -15,7 +15,10 @@ public class MessageService {
 
     public ConfirmPostMessage postMessage(MessageData messageData) {
         MessageData response = proxy.putMessageData(messageData);
-        return new ConfirmPostMessage(response.getId(), response.getText(), response.getCreatedTime());
+        return new ConfirmPostMessage()
+                .setId(response.getId())
+                .setText(response.getText())
+                .setCreatedTime(response.getCreatedTime());
     }
 
     public ListMessagesDataResponse getMessageListByRange(String from, String to) throws CustomIllegalArgumentException {
@@ -25,6 +28,8 @@ public class MessageService {
         } catch (Exception e) {
             throw new CustomIllegalArgumentException();
         }
-        return new ListMessagesDataResponse(response.getTotal(), response.getMessageList());
+        return new ListMessagesDataResponse()
+                .setTotal(response.getTotal())
+                .setMessageList(response.getMessageList());
     }
 }

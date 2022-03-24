@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors
+@Accessors(chain = true)
 public class ConfirmPostMessage {
 
     private Long id;
