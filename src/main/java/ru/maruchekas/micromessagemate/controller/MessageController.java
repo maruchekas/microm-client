@@ -1,5 +1,7 @@
 package ru.maruchekas.micromessagemate.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import ru.maruchekas.micromessagemate.service.MessageService;
 import ru.maruchekas.micromessagemate.service.MicroMessageProxyService;
 
 @RestController
+@Tag(name = "Контроллер клиента для работы с сообщениями")
 @RequestMapping("/api")
 public class MessageController {
 
@@ -24,6 +27,7 @@ public class MessageController {
     @Autowired
     MessageService messageService;
 
+    @Operation(summary = "Получение сообщения с сервера по id")
     @GetMapping("/message/{id}")
     public MessageData getMessage(@PathVariable("id") Long id) {
         MessageData response = proxy.returnMessageData(id);
@@ -31,6 +35,7 @@ public class MessageController {
         return new MessageData(response.getId(), response.getText(), response.getCreatedTime());
     }
 
+    @Operation(summary = "Получение списка сообщений с сервера в диапазоне дат")
     @GetMapping("/message/from/{from}/to/{to}")
     public ListMessagesDataResponse getMessageList(
             @PathVariable("from") String from, @PathVariable("to") String to) throws CustomIllegalArgumentException {
@@ -39,6 +44,7 @@ public class MessageController {
         return response;
     }
 
+    @Operation(summary = "Отправка сообщения на сервер")
     @PostMapping("/message")
     public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestBody MessageData messageData) {
         logger.info("Отправлено сообщение: \"{}\"", messageData.getText());
