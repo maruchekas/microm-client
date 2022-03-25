@@ -42,7 +42,7 @@ public class MessageControllerTest extends AbstractTest {
     void sendMessageTest() throws Exception {
         MessageData messageData = new MessageData();
         messageData.setText("test text");
-        String ctime = LocalDateTime.now().toString().substring(0,19);
+        String ctime = LocalDateTime.now().toString().substring(0,17);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/message")
                         .contentType(MediaType.APPLICATION_JSON)
