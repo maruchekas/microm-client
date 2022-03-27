@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.maruchekas.micromessagemate.AbstractTest;
 import ru.maruchekas.micromessagemate.data.MessageData;
-import ru.maruchekas.micromessagemate.service.MessageService;
+import ru.maruchekas.micromessagemate.service.ApiGeneralService;
 
 import java.time.LocalDateTime;
 
@@ -23,10 +23,10 @@ import static ru.maruchekas.micromessagemate.appconfig.Constants.INVALID_ARGUMEN
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(value = {"classpath:application-test.properties"})
-public class MessageControllerTest extends AbstractTest {
+public class ApiGeneralControllerTest extends AbstractTest {
 
     @Autowired
-    MessageService messageService;
+    ApiGeneralService apiGeneralService;
 
     @BeforeEach
     public void setup() {

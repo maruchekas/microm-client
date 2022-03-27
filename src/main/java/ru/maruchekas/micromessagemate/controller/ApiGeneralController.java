@@ -15,7 +15,7 @@ import ru.maruchekas.micromessagemate.response.ListMessagesDataResponse;
 import ru.maruchekas.micromessagemate.data.MessageData;
 import ru.maruchekas.micromessagemate.exception.CustomIllegalArgumentException;
 import ru.maruchekas.micromessagemate.response.ConfirmPostMessage;
-import ru.maruchekas.micromessagemate.service.MessageService;
+import ru.maruchekas.micromessagemate.service.ApiGeneralService;
 import ru.maruchekas.micromessagemate.service.MicroMessageProxyService;
 
 import java.util.List;
@@ -23,41 +23,39 @@ import java.util.List;
 @RestController
 @Tag(name = "Контроллер клиента для работы с сообщениями")
 @RequestMapping("/api")
-public class MessageController {
+public class ApiGeneralController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
-    private MicroMessageProxyService proxy;
 
     @Autowired
-    MessageService messageService;
+    ApiGeneralService apiGeneralService;
 
     @Operation(summary = "Авторизация на сервере")
     @PostMapping("/auth/login")
     public ResponseEntity<ConfirmLoginResponse> login(@RequestBody AuthData authData) {
         logger.info("Попытка входа пользователя \"{}\"", authData.getEmail());
-        return new ResponseEntity<>(messageService.loginUser(authData), HttpStatus.OK);
+        return new ResponseEntity<>(apiGeneralService.loginUser(authData), HttpStatus.OK);
     }
 
     @Operation(summary = "Запрос списка всех пользователей с сервера")
     @GetMapping("/auth/users")
     public ResponseEntity<List<UserData>> getAllUsers() {
         logger.info("Получение списка всех пользователей");
-        return new ResponseEntity<>(messageService.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(apiGeneralService.getAllUsers(), HttpStatus.OK);
     }
 
     @Operation(summary = "Получение сообщения с сервера по id")
     @GetMapping("/message/{id}")
     public MessageData getMessage(@PathVariable("id") Long id) {
         logger.info("Получено сообщение номер {}", id);
-        return messageService.getMessage(id);
+        return apiGeneralService.getMessage(id);
     }
 
     @Operation(summary = "Получение списка сообщений с сервера в диапазоне дат")
     @GetMapping("/message/from/{from}/to/{to}")
     public ListMessagesDataResponse getMessageList(
             @PathVariable("from") String from, @PathVariable("to") String to) throws CustomIllegalArgumentException {
-        ListMessagesDataResponse response = messageService.getMessageListByRange(from, to);
+        ListMessagesDataResponse response = apiGeneralService.getMessageListByRange(from, to);
         logger.info("Получено {} сообщений в диапазоне дат {} {}", response.getMessageList().size(), from, to);
         return response;
     }
@@ -66,7 +64,7 @@ public class MessageController {
     @PostMapping("/message")
     public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestBody MessageData messageData) {
         logger.info("Отправлено сообщение: \"{}\"", messageData.getText());
-        return new ResponseEntity<>(messageService.postMessage(messageData), HttpStatus.OK);
+        return new ResponseEntity<>(apiGeneralService.postMessage(messageData), HttpStatus.OK);
     }
 
 

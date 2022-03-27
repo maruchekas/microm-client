@@ -3,3 +3,5 @@ spring:
     name: message-mate
 server:
   port: 8008
+jwt:
+  secret: secret
