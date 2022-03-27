@@ -1,4 +1,4 @@
-package ru.maruchekas.micromessagemate.response;
+package ru.maruchekas.micromessagemate.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

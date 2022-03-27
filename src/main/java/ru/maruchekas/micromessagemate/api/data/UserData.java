@@ -1,5 +1,6 @@
-package ru.maruchekas.micromessagemate.data;
+package ru.maruchekas.micromessagemate.api.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,10 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class AuthData {
+public class UserData {
 
+    private Long id;
     private String email;
-    private String password;
+    @JsonProperty("type")
+    private String role;
 }

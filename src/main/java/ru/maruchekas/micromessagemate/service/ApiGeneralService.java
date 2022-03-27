@@ -2,14 +2,17 @@ package ru.maruchekas.micromessagemate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.maruchekas.micromessagemate.api.data.AuthData;
+import ru.maruchekas.micromessagemate.api.data.MessageData;
+import ru.maruchekas.micromessagemate.api.data.UserData;
+import ru.maruchekas.micromessagemate.api.response.ConfirmLoginResponse;
+import ru.maruchekas.micromessagemate.api.response.ConfirmPostMessage;
+import ru.maruchekas.micromessagemate.api.response.ListMessagesDataResponse;
 import ru.maruchekas.micromessagemate.appconfig.security.JwtGenerator;
-import ru.maruchekas.micromessagemate.data.AuthData;
-import ru.maruchekas.micromessagemate.data.MessageData;
-import ru.maruchekas.micromessagemate.data.UserData;
+import ru.maruchekas.micromessagemate.exception.AccessDeniedException;
 import ru.maruchekas.micromessagemate.exception.CustomIllegalArgumentException;
-import ru.maruchekas.micromessagemate.response.ConfirmLoginResponse;
-import ru.maruchekas.micromessagemate.response.ConfirmPostMessage;
-import ru.maruchekas.micromessagemate.response.ListMessagesDataResponse;
+import ru.maruchekas.micromessagemate.exception.IncorrectLoginPasswordPairException;
+import ru.maruchekas.micromessagemate.exception.MessageNotFoundException;
 
 import java.util.List;
 
@@ -32,8 +35,13 @@ public class ApiGeneralService {
                 .setCreatedTime(response.getCreatedTime());
     }
 
-    public MessageData getMessage(Long id){
-        MessageData response = proxy.returnMessageData(jwtToken, id);
+    public MessageData getMessage(Long id) throws MessageNotFoundException {
+        MessageData response;
+        try {
+            response = proxy.returnMessageData(jwtToken, id);
+        } catch (Exception e) {
+            throw new MessageNotFoundException();
+        }
         return new MessageData(response.getId(), response.getText(), response.getCreatedTime());
     }
 
@@ -49,13 +57,24 @@ public class ApiGeneralService {
                 .setMessageList(response.getMessageList());
     }
 
-    public List<UserData> getAllUsers(){
-        return proxy.getAllUsers(jwtToken);
+    public List<UserData> getAllUsers() throws AccessDeniedException {
+        List<UserData> users;
+        try {
+            users = proxy.getAllUsers(jwtToken);
+        } catch (Exception e) {
+            throw new AccessDeniedException();
+        }
+        return users;
     }
 
-    public ConfirmLoginResponse loginUser(AuthData authData){
-
+    public ConfirmLoginResponse loginUser(AuthData authData) throws IncorrectLoginPasswordPairException {
+        ConfirmLoginResponse response;
+        try {
+            response = proxy.login(authData);
+        } catch (Exception e) {
+            throw new IncorrectLoginPasswordPairException();
+        }
         jwtToken = jwtGenerator.generateToken(authData.getEmail());
-        return proxy.login(authData);
+        return response;
     }
 }

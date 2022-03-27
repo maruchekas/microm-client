@@ -1,4 +1,4 @@
-package ru.maruchekas.micromessagemate.data;
+package ru.maruchekas.micromessagemate.api.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

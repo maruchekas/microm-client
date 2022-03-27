@@ -3,11 +3,11 @@ package ru.maruchekas.micromessagemate.service;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
-import ru.maruchekas.micromessagemate.data.AuthData;
-import ru.maruchekas.micromessagemate.data.MessageData;
-import ru.maruchekas.micromessagemate.data.UserData;
-import ru.maruchekas.micromessagemate.response.ConfirmLoginResponse;
-import ru.maruchekas.micromessagemate.response.ListMessagesDataResponse;
+import ru.maruchekas.micromessagemate.api.data.AuthData;
+import ru.maruchekas.micromessagemate.api.data.MessageData;
+import ru.maruchekas.micromessagemate.api.data.UserData;
+import ru.maruchekas.micromessagemate.api.response.ConfirmLoginResponse;
+import ru.maruchekas.micromessagemate.api.response.ListMessagesDataResponse;
 
 import java.util.List;
 

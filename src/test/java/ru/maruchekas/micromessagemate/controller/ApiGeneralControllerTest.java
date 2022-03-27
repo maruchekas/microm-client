@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.maruchekas.micromessagemate.AbstractTest;
-import ru.maruchekas.micromessagemate.data.MessageData;
+import ru.maruchekas.micromessagemate.api.data.MessageData;
 import ru.maruchekas.micromessagemate.service.ApiGeneralService;
 
 import java.time.LocalDateTime;

@@ -8,15 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.maruchekas.micromessagemate.data.AuthData;
-import ru.maruchekas.micromessagemate.data.UserData;
-import ru.maruchekas.micromessagemate.response.ConfirmLoginResponse;
-import ru.maruchekas.micromessagemate.response.ListMessagesDataResponse;
-import ru.maruchekas.micromessagemate.data.MessageData;
+import ru.maruchekas.micromessagemate.api.data.AuthData;
+import ru.maruchekas.micromessagemate.api.data.UserData;
+import ru.maruchekas.micromessagemate.exception.AccessDeniedException;
+import ru.maruchekas.micromessagemate.exception.IncorrectLoginPasswordPairException;
+import ru.maruchekas.micromessagemate.api.response.ConfirmLoginResponse;
+import ru.maruchekas.micromessagemate.api.response.ListMessagesDataResponse;
+import ru.maruchekas.micromessagemate.api.data.MessageData;
 import ru.maruchekas.micromessagemate.exception.CustomIllegalArgumentException;
-import ru.maruchekas.micromessagemate.response.ConfirmPostMessage;
+import ru.maruchekas.micromessagemate.api.response.ConfirmPostMessage;
+import ru.maruchekas.micromessagemate.exception.MessageNotFoundException;
 import ru.maruchekas.micromessagemate.service.ApiGeneralService;
-import ru.maruchekas.micromessagemate.service.MicroMessageProxyService;
 
 import java.util.List;
 
@@ -32,21 +34,22 @@ public class ApiGeneralController {
 
     @Operation(summary = "Авторизация на сервере")
     @PostMapping("/auth/login")
-    public ResponseEntity<ConfirmLoginResponse> login(@RequestBody AuthData authData) {
+    public ResponseEntity<ConfirmLoginResponse> login(@RequestBody AuthData authData)
+            throws IncorrectLoginPasswordPairException {
         logger.info("Попытка входа пользователя \"{}\"", authData.getEmail());
         return new ResponseEntity<>(apiGeneralService.loginUser(authData), HttpStatus.OK);
     }
 
     @Operation(summary = "Запрос списка всех пользователей с сервера")
     @GetMapping("/auth/users")
-    public ResponseEntity<List<UserData>> getAllUsers() {
+    public ResponseEntity<List<UserData>> getAllUsers() throws AccessDeniedException {
         logger.info("Получение списка всех пользователей");
         return new ResponseEntity<>(apiGeneralService.getAllUsers(), HttpStatus.OK);
     }
 
     @Operation(summary = "Получение сообщения с сервера по id")
     @GetMapping("/message/{id}")
-    public MessageData getMessage(@PathVariable("id") Long id) {
+    public MessageData getMessage(@PathVariable("id") Long id) throws MessageNotFoundException {
         logger.info("Получено сообщение номер {}", id);
         return apiGeneralService.getMessage(id);
     }

@@ -1,10 +1,10 @@
-package ru.maruchekas.micromessagemate.response;
+package ru.maruchekas.micromessagemate.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import ru.maruchekas.micromessagemate.data.MessageData;
+import ru.maruchekas.micromessagemate.api.data.MessageData;
 
 import java.util.List;
 
