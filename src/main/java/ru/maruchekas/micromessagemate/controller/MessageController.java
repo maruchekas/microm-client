@@ -8,12 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.maruchekas.micromessagemate.data.AuthData;
+import ru.maruchekas.micromessagemate.data.UserData;
+import ru.maruchekas.micromessagemate.response.ConfirmLoginResponse;
 import ru.maruchekas.micromessagemate.response.ListMessagesDataResponse;
 import ru.maruchekas.micromessagemate.data.MessageData;
 import ru.maruchekas.micromessagemate.exception.CustomIllegalArgumentException;
 import ru.maruchekas.micromessagemate.response.ConfirmPostMessage;
 import ru.maruchekas.micromessagemate.service.MessageService;
 import ru.maruchekas.micromessagemate.service.MicroMessageProxyService;
+
+import java.util.List;
 
 @RestController
 @Tag(name = "Контроллер клиента для работы с сообщениями")
@@ -27,12 +32,25 @@ public class MessageController {
     @Autowired
     MessageService messageService;
 
+    @Operation(summary = "Авторизация на сервере")
+    @PostMapping("/auth/login")
+    public ResponseEntity<ConfirmLoginResponse> login(@RequestBody AuthData authData) {
+        logger.info("Попытка входа пользователя \"{}\"", authData.getEmail());
+        return new ResponseEntity<>(messageService.loginUser(authData), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Запрос списка всех пользователей с сервера")
+    @GetMapping("/auth/users")
+    public ResponseEntity<List<UserData>> getAllUsers() {
+        logger.info("Получение списка всех пользователей");
+        return new ResponseEntity<>(messageService.getAllUsers(), HttpStatus.OK);
+    }
+
     @Operation(summary = "Получение сообщения с сервера по id")
     @GetMapping("/message/{id}")
     public MessageData getMessage(@PathVariable("id") Long id) {
-        MessageData response = proxy.returnMessageData(id);
-        logger.info("{}", response);
-        return new MessageData(response.getId(), response.getText(), response.getCreatedTime());
+        logger.info("Получено сообщение номер {}", id);
+        return messageService.getMessage(id);
     }
 
     @Operation(summary = "Получение списка сообщений с сервера в диапазоне дат")
@@ -50,5 +68,6 @@ public class MessageController {
         logger.info("Отправлено сообщение: \"{}\"", messageData.getText());
         return new ResponseEntity<>(messageService.postMessage(messageData), HttpStatus.OK);
     }
+
 
 }
