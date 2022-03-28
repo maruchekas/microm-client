@@ -21,7 +21,7 @@ import ru.maruchekas.micromessagemate.service.ApiGeneralService;
 
 import java.time.LocalDateTime;
 
-import static ru.maruchekas.micromessagemate.appconfig.Constants.INVALID_ARGUMENT_ERR;
+import static ru.maruchekas.micromessagemate.appconfig.Constants.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,20 +58,6 @@ public class ApiGeneralControllerTest extends AbstractTest {
     }
 
     @Test
-    void sendMessageBadTest() throws Exception {
-        MessageData messageData = new MessageData();
-        messageData.setText("test text");
-        String ctime = LocalDateTime.now().toString().substring(0,17);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/message")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(messageData)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("access"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-
-    @Test
     void loginUserTest() throws Exception {
 
         AuthData authData = new AuthData();
@@ -85,6 +71,22 @@ public class ApiGeneralControllerTest extends AbstractTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists());
+    }
+
+    @Test
+    void loginUserBadTest() throws Exception {
+
+        AuthData authData = new AuthData();
+        authData.setEmail(adminEmail);
+        authData.setPassword(userPass);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(authData)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(INCORRECT_LOGIN_OR_PASSWORD));
     }
 
     @Test
@@ -105,6 +107,20 @@ public class ApiGeneralControllerTest extends AbstractTest {
     }
 
     @Test
+    void sendMessageBadTest() throws Exception {
+        MessageData messageData = new MessageData();
+        messageData.setText("test text");
+        jwtToken = jwtGenerator.generateToken(userEmail);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/message")
+                        .contentType(MediaType.APPLICATION_JSON).header("Authorization", jwtToken)
+                        .content(mapper.writeValueAsString(messageData)))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("access"))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
     void getMessageListTest() throws Exception {
 
         jwtToken = jwtGenerator.generateToken(userEmail);
@@ -121,14 +137,47 @@ public class ApiGeneralControllerTest extends AbstractTest {
     @Test
     void getMessageListBadTest() throws Exception {
 
+        jwtToken = jwtGenerator.generateToken(userEmail);
         String fromTime = LocalDateTime.now().minusDays(1L).toString();
         String toTime = LocalDateTime.now().toString();
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/message/from/"+ fromTime.replace('T', ' ') + "/to/" + toTime)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).header("Authorization", jwtToken))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(INVALID_ARGUMENT_ERR))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void getMessageByIdTest() throws Exception {
+        jwtToken = jwtGenerator.generateToken(userEmail);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message/{id}", 3)
+                .contentType(MediaType.APPLICATION_JSON).header("Authorization", jwtToken))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(3))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void getMessageByIdBadTest() throws Exception {
+        jwtToken = jwtGenerator.generateToken(userEmail);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message/{id}", 1000)
+                        .contentType(MediaType.APPLICATION_JSON).header("Authorization", jwtToken))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(MESSAGE_NOT_FOUND))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void getMessageByIdBadNotAuthorizedTest() throws Exception {
+        jwtToken = jwtGenerator.generateToken(userEmail);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message/{id}", 1000)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

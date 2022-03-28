@@ -8,7 +8,6 @@ import ru.maruchekas.micromessagemate.api.data.UserData;
 import ru.maruchekas.micromessagemate.api.response.ConfirmLoginResponse;
 import ru.maruchekas.micromessagemate.api.response.ConfirmPostMessage;
 import ru.maruchekas.micromessagemate.api.response.ListMessagesDataResponse;
-import ru.maruchekas.micromessagemate.appconfig.security.JwtGenerator;
 import ru.maruchekas.micromessagemate.exception.AccessDeniedException;
 import ru.maruchekas.micromessagemate.exception.CustomIllegalArgumentException;
 import ru.maruchekas.micromessagemate.exception.IncorrectLoginPasswordPairException;
@@ -22,15 +21,10 @@ public class ApiGeneralService {
     @Autowired
     private MicroMessageProxyService proxy;
 
-    @Autowired
-    JwtGenerator jwtGenerator;
-
-    private static String jwtToken;
-
-    public ConfirmPostMessage postMessage(MessageData messageData) throws AccessDeniedException {
+    public ConfirmPostMessage postMessage(String token, MessageData messageData) throws AccessDeniedException {
         MessageData response;
         try {
-        response = proxy.postMessageData(jwtToken, messageData);
+        response = proxy.postMessageData(token, messageData);
 
         } catch (Exception e){
             throw new AccessDeniedException();
@@ -41,20 +35,21 @@ public class ApiGeneralService {
                 .setCreatedTime(response.getCreatedTime());
     }
 
-    public MessageData getMessage(Long id) throws MessageNotFoundException {
+    public MessageData getMessage(String token, Long id) throws MessageNotFoundException {
         MessageData response;
         try {
-            response = proxy.returnMessageData(jwtToken, id);
+            response = proxy.returnMessageData(token, id);
         } catch (Exception e) {
             throw new MessageNotFoundException();
         }
         return new MessageData(response.getId(), response.getText(), response.getCreatedTime());
     }
 
-    public ListMessagesDataResponse getMessageListByRange(String from, String to) throws CustomIllegalArgumentException {
+    public ListMessagesDataResponse getMessageListByRange(String token, String from, String to)
+            throws CustomIllegalArgumentException {
         ListMessagesDataResponse response;
         try {
-            response = proxy.returnMessageList(jwtToken, from, to);
+            response = proxy.returnMessageList(token, from, to);
         } catch (Exception e) {
             throw new CustomIllegalArgumentException();
         }
@@ -63,10 +58,10 @@ public class ApiGeneralService {
                 .setMessageList(response.getMessageList());
     }
 
-    public List<UserData> getAllUsers() throws AccessDeniedException {
+    public List<UserData> getAllUsers(String token) throws AccessDeniedException {
         List<UserData> users;
         try {
-            users = proxy.getAllUsers(jwtToken);
+            users = proxy.getAllUsers(token);
         } catch (Exception e) {
             throw new AccessDeniedException();
         }
@@ -80,7 +75,6 @@ public class ApiGeneralService {
         } catch (Exception e) {
             throw new IncorrectLoginPasswordPairException();
         }
-        jwtToken = jwtGenerator.generateToken(authData.getEmail());
         return response;
     }
 }

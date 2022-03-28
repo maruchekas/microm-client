@@ -42,32 +42,35 @@ public class ApiGeneralController {
 
     @Operation(summary = "Запрос списка всех пользователей с сервера")
     @GetMapping("/auth/users")
-    public ResponseEntity<List<UserData>> getAllUsers() throws AccessDeniedException {
+    public ResponseEntity<List<UserData>> getAllUsers(@RequestHeader("Authorization") String token)
+            throws AccessDeniedException {
         logger.info("Получение списка всех пользователей");
-        return new ResponseEntity<>(apiGeneralService.getAllUsers(), HttpStatus.OK);
+        return new ResponseEntity<>(apiGeneralService.getAllUsers(token), HttpStatus.OK);
     }
 
     @Operation(summary = "Получение сообщения с сервера по id")
     @GetMapping("/message/{id}")
-    public MessageData getMessage(@PathVariable("id") Long id) throws MessageNotFoundException {
+    public MessageData getMessage(@RequestHeader("Authorization") String token, @PathVariable("id") Long id)
+            throws MessageNotFoundException {
         logger.info("Получено сообщение номер {}", id);
-        return apiGeneralService.getMessage(id);
+        return apiGeneralService.getMessage(token, id);
     }
 
     @Operation(summary = "Получение списка сообщений с сервера в диапазоне дат")
     @GetMapping("/message/from/{from}/to/{to}")
-    public ListMessagesDataResponse getMessageList(
+    public ListMessagesDataResponse getMessageList(@RequestHeader("Authorization") String token,
             @PathVariable("from") String from, @PathVariable("to") String to) throws CustomIllegalArgumentException {
-        ListMessagesDataResponse response = apiGeneralService.getMessageListByRange(from, to);
+        ListMessagesDataResponse response = apiGeneralService.getMessageListByRange(token, from, to);
         logger.info("Получено {} сообщений в диапазоне дат {} {}", response.getMessageList().size(), from, to);
         return response;
     }
 
     @Operation(summary = "Отправка сообщения на сервер")
     @PostMapping("/message")
-    public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestBody MessageData messageData) throws AccessDeniedException {
+    public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestHeader("Authorization") String token,
+                                                          @RequestBody MessageData messageData) throws AccessDeniedException {
         logger.info("Отправлено сообщение: \"{}\"", messageData.getText());
-        return new ResponseEntity<>(apiGeneralService.postMessage(messageData), HttpStatus.OK);
+        return new ResponseEntity<>(apiGeneralService.postMessage(token, messageData), HttpStatus.OK);
     }
 
 
