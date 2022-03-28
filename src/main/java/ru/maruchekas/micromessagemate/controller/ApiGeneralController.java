@@ -65,7 +65,7 @@ public class ApiGeneralController {
 
     @Operation(summary = "Отправка сообщения на сервер")
     @PostMapping("/message")
-    public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestBody MessageData messageData) {
+    public ResponseEntity<ConfirmPostMessage> sendMessage(@RequestBody MessageData messageData) throws AccessDeniedException {
         logger.info("Отправлено сообщение: \"{}\"", messageData.getText());
         return new ResponseEntity<>(apiGeneralService.postMessage(messageData), HttpStatus.OK);
     }

@@ -27,8 +27,14 @@ public class ApiGeneralService {
 
     private static String jwtToken;
 
-    public ConfirmPostMessage postMessage(MessageData messageData) {
-        MessageData response = proxy.postMessageData(jwtToken, messageData);
+    public ConfirmPostMessage postMessage(MessageData messageData) throws AccessDeniedException {
+        MessageData response;
+        try {
+        response = proxy.postMessageData(jwtToken, messageData);
+
+        } catch (Exception e){
+            throw new AccessDeniedException();
+        }
         return new ConfirmPostMessage()
                 .setId(response.getId())
                 .setText(response.getText())
